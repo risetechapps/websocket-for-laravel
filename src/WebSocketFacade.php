@@ -6,6 +6,7 @@ use Illuminate\Support\Facades\Facade;
 
 /**
  * @see \RiseTechApps\WebSocket\Skeleton\SkeletonClass
+ * @method routes($options = [])
  */
 class WebSocketFacade extends Facade
 {
