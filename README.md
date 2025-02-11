@@ -1,37 +1,54 @@
-# Very short description of the package
+# Laravel WebSocket
 
-[![Latest Version on Packagist](https://img.shields.io/packagist/v/RiseTechApps\/address.svg?style=flat-square)](https://packagist.org/packages/RiseTechApps\/address)
-[![Total Downloads](https://img.shields.io/packagist/dt/RiseTechApps\/address.svg?style=flat-square)](https://packagist.org/packages/RiseTechApps\/address)
-![GitHub Actions](https://github.com/RiseTechApps\/address/actions/workflows/main.yml/badge.svg)
+## 📌 Sobre o Projeto
+O **Laravel WebSocket** é um package para Laravel que fornece autenticação via API (usando Laravel Sanctum) e gerenciamento de planos com limites de requisições.
 
-This is where your description should go. Try and limit it to a paragraph or two, and maybe throw in a mention of what PSRs you support to avoid any confusion with users and contributors.
+## ✨ Funcionalidades
+- 🔑 **Pusher** com esse package você pode se conectar e gerenciar qualquer conexão com servidores pusher
+---
 
-## Installation
+## 🚀 Instalação
 
-You can install the package via composer:
+### 1️⃣ Requisitos
+Antes de instalar, certifique-se de que seu projeto atenda aos seguintes requisitos:
+- PHP >= 8.0
+- Laravel >= 10
+- Composer instalado
 
+### 2️⃣ Instalação do Package
+Execute o seguinte comando no terminal:
 ```bash
-
-composer require RiseTechApps\apps/address
+  composer require risetechapps/websocet-for-tenancy
 ```
 
-### Changelog
+### 3️⃣ Publicar Configurações
+```bash
+  php artisan vendor:publish --provider="RiseTechApps\WebSocket\WebSocketServiceProvider"
+```
 
-Please see [CHANGELOG](CHANGELOG.md) for more information what has changed recently.
+Isso criará o arquivo `config/apimanager.php`, onde você pode configurar os planos e limites.
 
-## Contributing
+### 4️⃣ Rodar Migrations
+```bash
+  php artisan migrate
+```
 
-Please see [CONTRIBUTING](CONTRIBUTING.md) for details.
 
-### Security
+---
 
-If you discover any security related issues, please email apps@RiseTechApps\.com.br instead of using the issue tracker.
+## 🛠 Contribuição
+Sinta-se à vontade para contribuir! Basta seguir estes passos:
+1. Faça um fork do repositório
+2. Crie uma branch (`feature/nova-funcionalidade`)
+3. Faça um commit das suas alterações
+4. Envie um Pull Request
 
-## Credits
+---
 
--   [Rise Tech](https://github.com/RiseTechApps\apps)
--   [All Contributors](../../contributors)
+## 📜 Licença
+Este projeto é distribuído sob a licença MIT. Veja o arquivo [LICENSE](LICENSE) para mais detalhes.
 
-## License
+---
 
-The MIT License (MIT). Please see [License File](LICENSE.md) for more information.
+💡 **Desenvolvido por [Rise Tech](https://risetech.com.br)**
+
