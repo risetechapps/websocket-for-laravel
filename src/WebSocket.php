@@ -13,10 +13,14 @@ use RiseTechApps\WebSocket\Features\WebSocketAuth;
 
 class WebSocket
 {
-    protected static array $options = ['host' => 'pusher.risetech.dev.br'];
+    protected static array $options = [];
 
     public static function connect($authKey, $secret, $appKey)
     {
+        static::$options = [
+            'host' => Config::get('websocket.host'),
+        ];
+
         try {
             $pusher = new Pusher($authKey, $secret, $appKey, self::$options);
             $channels = $pusher->getChannels();

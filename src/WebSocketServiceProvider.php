@@ -16,6 +16,12 @@ class WebSocketServiceProvider extends ServiceProvider
     public function boot(): void
     {
         $this->loadMigrationsFrom(__DIR__ . '/../database/migrations');
+
+        if ($this->app->runningInConsole()) {
+            $this->publishes([
+                __DIR__ . '/../config/config.php' => config_path('websocket.php'),
+            ], 'config');
+        }
     }
 
     /**
@@ -23,6 +29,11 @@ class WebSocketServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
+
+        if (file_exists(base_path('config/websocket.php'))) {
+            $this->mergeConfigFrom(__DIR__ . '/../config/config.php', 'websocket');
+        }
+
         // Register the main class to use with the facade
         $this->app->singleton('websocket', function () {
             return new WebSocket;
