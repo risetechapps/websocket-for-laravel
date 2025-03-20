@@ -19,7 +19,7 @@ class WebSocketServiceProvider extends ServiceProvider
 
         if ($this->app->runningInConsole()) {
             $this->publishes([
-                __DIR__ . '/../config/config.php' => config_path('websocket.php'),
+                __DIR__ . '/../config/config.php' => config_path('websockets.php'),
             ], 'config');
         }
     }
@@ -29,10 +29,7 @@ class WebSocketServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-
-        if (file_exists(base_path('config/websocket.php'))) {
-            $this->mergeConfigFrom(__DIR__ . '/../config/config.php', 'websocket');
-        }
+        $this->mergeConfigFrom(__DIR__ . '/../config/config.php', 'websockets');
 
         // Register the main class to use with the facade
         $this->app->singleton('websocket', function () {
