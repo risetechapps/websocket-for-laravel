@@ -4,9 +4,7 @@ namespace RiseTechApps\WebSocket;
 
 use GuzzleHttp\Exception\GuzzleException;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Broadcast;
 use Illuminate\Support\Facades\Config;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Route;
 use Pusher\Pusher;
 use RiseTechApps\WebSocket\Features\WebSocketAuth;
@@ -15,10 +13,10 @@ class WebSocket
 {
     protected static array $options = [];
 
-    public static function connect($authKey, $secret, $appKey)
+    public static function connect($authKey, $secret, $appKey): void
     {
         static::$options = [
-            'host' => Config::get('websocket.host'),
+            'host' => Config::get('websockets.host'),
         ];
 
         try {
