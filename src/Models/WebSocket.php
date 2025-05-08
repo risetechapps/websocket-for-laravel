@@ -1,6 +1,6 @@
 <?php
 
-namespace RiseTechApps\WebSocket\Model;
+namespace RiseTechApps\WebSocket\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
