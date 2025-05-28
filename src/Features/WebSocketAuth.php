@@ -5,6 +5,7 @@ namespace RiseTechApps\WebSocket\Features;
 use Illuminate\Http\Request;
 use Pusher\Pusher;
 use Pusher\PusherException;
+use Illuminate\Http\JsonResponse;
 
 class WebSocketAuth
 {
@@ -12,54 +13,67 @@ class WebSocketAuth
     protected static string $channel;
     protected static string $socketId;
 
-    /**
-     * @throws PusherException
-     */
-    public static function auth(Request $request): string
+    public static function auth(Request $request): JsonResponse
     {
-        self::$connect = self::connect();
-        self::$channel = self::getChannel($request);
-        self::$socketId = self::getSocketId($request);
-        return self::generateToken();
+        try {
+            // Validar entrada
+            $channel = $request->input('channel_name');
+            $socketId = $request->input('socket_id');
+
+            if (empty($channel) || empty($socketId)) {
+                return response()->json(['error' => 'channel_name and socket_id are required'], 400);
+            }
+
+            if (!auth()->check()) {
+                return response()->json(['error' => 'User not authenticated'], 401);
+            }
+
+            self::$connect = self::connect();
+            self::$channel = $channel;
+            self::$socketId = $socketId;
+
+            $authResponse = self::generateToken();
+
+            // Retorna JSON com a resposta para o frontend
+            return response()->json(json_decode($authResponse));
+
+        } catch (PusherException $e) {
+            return response()->json(['error' => 'Pusher error: ' . $e->getMessage()], 500);
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Server error: ' . $e->getMessage()], 500);
+        }
     }
 
-    /**
-     * @throws PusherException
-     */
     private static function connect(): Pusher
     {
         $default = config('broadcasting.default');
+        $config = config("broadcasting.connections.{$default}");
 
-        $config = config('broadcasting.connections.' . $default);
-
-        if ($config['driver'] == 'pusher') {
+        if ($config['driver'] === 'pusher') {
             return new Pusher(
-                config("broadcasting.connections.${default}.key") ?? null,
-                config("broadcasting.connections.${default}.secret") ?? null,
-                config("broadcasting.connections.${default}.app_id") ?? null,
+                $config['key'] ?? '',
+                $config['secret'] ?? '',
+                $config['app_id'] ?? '',
                 $config['options'] ?? []
             );
         }
+
+        // fallback vazio para evitar erro
         return new Pusher("", "", "");
     }
 
-    protected static function getChannel($request): ?string
-    {
-        return $request->input('channel_name') ?? null;
-    }
-
-    private static function getSocketId(Request $request)
-    {
-        return $request->input('socket_id');
-    }
-
-    /**
-     * @throws PusherException
-     */
     private static function generateToken(): string
     {
-        return self::$connect->authorizePresenceChannel(self::$channel, self::$socketId, tenancy()->getTenantKey(), [
-            'token' => auth()->user()->currentAccessToken()->token,
-        ]);
+        $user = auth()->user();
+        $tenantKey = function_exists('tenancy') ? tenancy()->getTenantKey() : null;
+
+        return self::$connect->authorizePresenceChannel(
+            self::$channel,
+            self::$socketId,
+            $tenantKey,
+            [
+                'token' => $user->currentAccessToken()->token,
+            ]
+        );
     }
 }

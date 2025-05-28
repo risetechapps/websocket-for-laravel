@@ -1,11 +1,11 @@
 {
-    "name": "risetechapps/websocet-for-tenancy",
+    "name": "risetechapps/websocket-for-laravel",
     "description": "",
     "keywords": [
         "risetechapps",
         "websocket"
     ],
-    "homepage": "https://github.com/risetechapps/websocket-for-tenancy",
+    "homepage": "https://github.com/risetechapps/websocket-for-laravel",
     "license": "MIT",
     "type": "library",
     "authors": [
@@ -18,8 +18,8 @@
     "require": {
         "php": "^8.1",
         "illuminate/support": "^9.0|^10.0",
-        "risetechapps/has-uuid-for-laravel": "^1.0",
-        "pusher/pusher-php-server": "^7.2.6"
+        "pusher/pusher-php-server": "^7.2.6",
+        "risetechapps/has-uuid-for-laravel": "^1.0"
     },
     "require-dev": {
         "orchestra/testbench": "^7.0|^8.0",
@@ -54,6 +54,5 @@
         }
     },
     "minimum-stability": "stable",
-    "prefer-stable": true,
-    "version": "1.0.0"
+    "prefer-stable": true
 }
