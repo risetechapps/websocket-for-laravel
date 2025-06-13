@@ -2,44 +2,32 @@
 
 namespace RiseTechApps\WebSocket;
 
+use Exception;
 use GuzzleHttp\Exception\GuzzleException;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Route;
-use Pusher\Pusher;
+use RiseTechApps\WebSocket\Contracts\WebSocketContract;
+use RiseTechApps\WebSocket\Features\Driver\WebSocketAbly;
+use RiseTechApps\WebSocket\Features\Driver\WebSocketPusher;
 use RiseTechApps\WebSocket\Features\WebSocketAuth;
 
 class WebSocket
 {
-    protected static array $options = [];
-
-    public static function connect($authKey, $secret, $appKey): void
+    /**
+     * @throws Exception
+     * @throws GuzzleException
+     */
+    public static function connect(): WebSocketContract
     {
-        static::$options = [
-            'host' => Config::get('websockets.host'),
-        ];
+        $default = \config('broadcasting.default');
+        $driver = \config('broadcasting.connections.' . $default . '.driver') ?? null;
+        $config = \config('broadcasting.connections.' . $default) ?? [];
 
-        try {
-            $pusher = new Pusher($authKey, $secret, $appKey, self::$options);
-            $channels = $pusher->getChannels();
-            $connections = config('broadcasting.connections');
-
-            $connections['tenant'] = [
-                'driver' => 'pusher',
-                'key' => $authKey,
-                'secret' => $secret,
-                'app_id' => $appKey,
-                'options' => self::$options
-            ];
-
-            Config::set('broadcasting.connections', $connections);
-            Config::set('broadcasting.default', 'tenant');
-
-        } catch (\Exception $e) {
-
-        } catch (GuzzleException $e) {
-
-        }
+        return match ($driver) {
+            'pusher' => WebSocketPusher::connect($config),
+            'ably' => WebSocketAbly::connect($config),
+            default => null
+        };
     }
 
     public function routes($options = []): void
