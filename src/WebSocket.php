@@ -34,7 +34,7 @@ class WebSocket
     {
         Route::group($options, function () use ($options) {
 
-            Route::any('/broadcasting/auth', function (Request $request) use ($options) {
+            Route::any('/broadcast', function (Request $request) use ($options) {
 
                 return WebSocketAuth::auth($request);
             });

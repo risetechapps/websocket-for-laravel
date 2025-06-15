@@ -2,6 +2,7 @@
 
 namespace RiseTechApps\WebSocket\Features;
 
+use Ably\AblyRest;
 use Illuminate\Http\Request;
 use Pusher\Pusher;
 use Pusher\PusherException;
@@ -16,31 +17,46 @@ class WebSocketAuth
     public static function auth(Request $request): JsonResponse
     {
         try {
-            // Validar entrada
-            $channel = $request->input('channel_name');
-            $socketId = $request->input('socket_id');
 
-            if (empty($channel) || empty($socketId)) {
-                return response()->json(['error' => 'channel_name and socket_id are required'], 400);
+            $user = auth()->user();
+
+            if (!$user) {
+                return response()->json(['error' => 'Unauthorized'], 401);
             }
 
-            if (!auth()->check()) {
-                return response()->json(['error' => 'User not authenticated'], 401);
+            $ablyApiKey = config('broadcasting.connections.ably.key');
+            $ably = new AblyRest($ablyApiKey);
+
+            $clientId = $request->input('clientId', (string)$user->getKey());
+            $channelName = $request->input('channelName');
+            $capability = ['subscribe', 'presence', 'publish'];
+
+            if ($channelName) {
+                $capability = [$channelName => ['subscribe', 'presence']];
+                if (str_starts_with($channelName, 'presence-')) {
+                    $capability[$channelName][] = 'publish';
+                }
+            } else {
+                $capability = ['*' => ['subscribe', 'presence', 'publish']];
             }
 
-            self::$connect = self::connect();
-            self::$channel = $channel;
-            self::$socketId = $socketId;
+            try {
+                $tokenRequest = $ably->auth->createTokenRequest([
+                    'clientId' => (string)$clientId,
+                    'capability' => $capability,
+                    'timestamp' => $request->input('timestamp'),
+                    'nonce' => $request->input('nonce'),
+                ]);
 
-            $authResponse = self::generateToken();
-
-            // Retorna JSON com a resposta para o frontend
-            return response()->json(json_decode($authResponse));
+                return response()->json($tokenRequest->toArray());
+            } catch (\Exception $e) {
+                return response()->json(['error' => 'Unauthorized'], 401);
+            }
 
         } catch (PusherException $e) {
-            return response()->json(['error' => 'Pusher error: ' . $e->getMessage()], 500);
+            return response()->json(['error' => 'Unauthorized'], 401);
         } catch (\Exception $e) {
-            return response()->json(['error' => 'Server error: ' . $e->getMessage()], 500);
+            return response()->json(['error' => 'Unauthorized'], 401);
         }
     }
 
